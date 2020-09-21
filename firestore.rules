@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth.uid != null;
+    }
+  }
+}
+
+//https://gist.github.com/Dohyunwoo/b8370f208619c7f44a2a13fb390e1514

@@ -1,20 +1,35 @@
 {
-  "name": "nameless-lab",
+  "name": "nameless-lab-order",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.56",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
+    "clsx": "^1.1.1",
+    "dayjs": "^1.8.35",
+    "firebase": "^7.16.1",
+    "material-table": "^1.67.1",
+    "mui-datatables": "^3.3.1",
+    "nanoid": "^3.1.12",
+    "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
+    "react-hook-form": "^6.7.2",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "3.4.1",
+    "recharts": "^1.8.5",
+    "styled-components": "^5.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "db": "firebase emulators:start --import=./emulators --export-on-exit"
   },
   "eslintConfig": {
     "extends": "react-app"

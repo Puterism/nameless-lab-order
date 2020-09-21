@@ -21,3 +21,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.log
+
+nameless-lab-order-firebase-adminsdk-7grwf-6583c974a8.json
+.env

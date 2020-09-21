@@ -1,0 +1,19 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "item",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "available",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
