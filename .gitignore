@@ -25,3 +25,4 @@ yarn-error.log*
 
 nameless-lab-order-firebase-adminsdk-7grwf-6583c974a8.json
 .env
+/emulators
