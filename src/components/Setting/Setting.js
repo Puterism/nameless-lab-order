@@ -6,62 +6,26 @@ import {
   Typography,
   Button,
   TextField,
-  Snackbar,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
 } from '@material-ui/core';
-import MuiAlert from '@material-ui/lab/Alert';
 import useStyles from './Setting.css';
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+import { LoadingButton } from 'base.css';
+import useAlert from 'hooks/useAlert';
 
 export default function Setting() {
   const classes = useStyles();
+  const { openAlert, renderAlert } = useAlert();
+
+  const [fetching, setFetching] = useState(false);
 
   const [dialogOpen, setDialogOpen] = useState({
     editProfile: false,
     changePassword: false,
   });
-
-  const [alert, setAlert] = useState({
-    open: false,
-    severity: 'info',
-    message: '',
-  });
-
-  // eslint-disable-next-line
-  const openAlert = useCallback((message, severity) => {
-    setAlert((prevState) => {
-      let newAlert = { ...prevState };
-      newAlert.open = true;
-      newAlert.message = message;
-      newAlert.severity = severity;
-      return newAlert;
-    });
-  }, []);
-
-  const closeAlert = useCallback(() => {
-    setAlert((prevState) => {
-      let newAlert = { ...prevState };
-      newAlert.open = false;
-      return newAlert;
-    });
-  }, []);
-
-  const handleAlertClose = useCallback(
-    (event, reason) => {
-      if (reason === 'clickaway') {
-        return;
-      }
-      closeAlert();
-    },
-    [closeAlert],
-  );
 
   const handleClickOpenDialog = useCallback((dialog) => {
     setDialogOpen((prevState) => ({
@@ -119,11 +83,7 @@ export default function Setting() {
         </Card>
       </Grid>
 
-      <Snackbar open={alert.open} autoHideDuration={3000} onClose={handleAlertClose}>
-        <Alert onClose={handleAlertClose} severity={alert.severity}>
-          {alert.message}
-        </Alert>
-      </Snackbar>
+      {renderAlert}
 
       <Dialog open={dialogOpen.editProfile} onClose={() => handleCloseDialog('editProfile')} aria-labelledby="create-account-edit-profile">
         <DialogTitle id="create-account-edit-profile">계정 정보 수정</DialogTitle>
@@ -136,9 +96,9 @@ export default function Setting() {
           <Button onClick={() => handleCloseDialog('editProfile')} color="primary">
             닫기
           </Button>
-          <Button onClick={() => handleCloseDialog('editProfile')} color="primary">
+          <LoadingButton loading={fetching} onClick={() => handleCloseDialog('editProfile')} color="primary">
             계정 생성
-          </Button>
+          </LoadingButton>
         </DialogActions>
       </Dialog>
       <Dialog
@@ -155,9 +115,9 @@ export default function Setting() {
           <Button onClick={() => handleCloseDialog('changePassword')} color="primary">
             닫기
           </Button>
-          <Button onClick={() => handleCloseDialog('changePassword')} color="primary">
+          <LoadingButton loading={fetching} onClick={() => handleCloseDialog('changePassword')} color="primary">
             비밀번호 변경
-          </Button>
+          </LoadingButton>
         </DialogActions>
       </Dialog>
     </Grid>

@@ -1,6 +1,4 @@
-import { makeStyles, withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import { red, green } from '@material-ui/core/colors';
+import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
   appBarSpacer: theme.mixins.toolbar,
@@ -24,25 +22,5 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-
-export const CancelButton = withStyles((theme) => ({
-  root: {
-    color: theme.palette.getContrastText(red[700]),
-    backgroundColor: red[700],
-    '&:hover': {
-      backgroundColor: red[900],
-    },
-  },
-}))(Button);
-
-export const ConfirmButton = withStyles((theme) => ({
-  root: {
-    color: theme.palette.getContrastText(green[700]),
-    backgroundColor: green[700],
-    '&:hover': {
-      backgroundColor: green[900],
-    },
-  },
-}))(Button);
 
 export default useStyles;

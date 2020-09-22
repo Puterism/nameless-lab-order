@@ -7,7 +7,6 @@ import {
   Typography,
   Button,
   TextField,
-  Snackbar,
   Dialog,
   DialogActions,
   DialogContent,
@@ -18,57 +17,23 @@ import {
   Radio,
   RadioGroup,
 } from '@material-ui/core';
-import MuiAlert from '@material-ui/lab/Alert';
 import useStyles from './Account.css';
+import { LoadingButton } from 'base.css';
 import { createAccount, grantAdmin, releaseAdmin, disableAccount, enableAccount } from 'api';
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+import useAlert from 'hooks/useAlert';
 
 export default function Account() {
   const classes = useStyles();
   const { register, control, handleSubmit } = useForm();
+  const { openAlert, renderAlert } = useAlert();
+
+  const [fetching, isFetching] = useState(false);
 
   const [dialogOpen, setDialogOpen] = useState({
     createAccount: false,
     grantAdmin: false,
     disableAccount: false,
   });
-
-  const [alert, setAlert] = useState({
-    open: false,
-    severity: 'info',
-    message: '',
-  });
-
-  const openAlert = useCallback((message, severity) => {
-    setAlert((prevState) => {
-      let newAlert = { ...prevState };
-      newAlert.open = true;
-      newAlert.message = message;
-      newAlert.severity = severity;
-      return newAlert;
-    });
-  }, []);
-
-  const closeAlert = useCallback(() => {
-    setAlert((prevState) => {
-      let newAlert = { ...prevState };
-      newAlert.open = false;
-      return newAlert;
-    });
-  }, []);
-
-  const handleAlertClose = useCallback(
-    (event, reason) => {
-      if (reason === 'clickaway') {
-        return;
-      }
-      closeAlert();
-    },
-    [closeAlert],
-  );
 
   const handleClickOpenDialog = useCallback((dialog) => {
     setDialogOpen((prevState) => ({
@@ -86,6 +51,7 @@ export default function Account() {
 
   const handleSubmitCreateAccount = useCallback(
     async (data) => {
+      isFetching(true);
       const { name, email } = data;
       const password = 'nameless';
       try {
@@ -99,12 +65,14 @@ export default function Account() {
       } catch (err) {
         openAlert(`에러 발생 : ${err}`, 'error');
       }
+      isFetching(false);
     },
     [handleCloseDialog, openAlert],
   );
 
   const handleSubmitGrantAdmin = useCallback(
     async (data) => {
+      isFetching(true);
       const { email, select } = data;
       try {
         if (!!email && select === 'assign') {
@@ -121,12 +89,14 @@ export default function Account() {
       } catch (err) {
         openAlert(`에러 발생 : ${err}`, 'error');
       }
+      isFetching(false);
     },
     [handleCloseDialog, openAlert],
   );
 
   const handleSubmitDisableAccount = useCallback(
     async (data) => {
+      isFetching(true);
       const { email, select } = data;
       try {
         if (!!email && select === 'disable') {
@@ -143,6 +113,7 @@ export default function Account() {
       } catch (err) {
         openAlert(`에러 발생 : ${err}`, 'error');
       }
+      isFetching(false);
     },
     [handleCloseDialog, openAlert],
   );
@@ -206,11 +177,7 @@ export default function Account() {
         </Card>
       </Grid>
 
-      <Snackbar open={alert.open} autoHideDuration={3000} onClose={handleAlertClose}>
-        <Alert onClose={handleAlertClose} severity={alert.severity}>
-          {alert.message}
-        </Alert>
-      </Snackbar>
+      {renderAlert}
 
       <Dialog
         open={dialogOpen.createAccount}
@@ -245,9 +212,9 @@ export default function Account() {
             <Button type="button" onClick={() => handleCloseDialog('createAccount')} color="primary">
               닫기
             </Button>
-            <Button type="submit" color="primary">
+            <LoadingButton loading={fetching} type="submit" color="primary">
               계정 생성
-            </Button>
+            </LoadingButton>
           </DialogActions>
         </form>
       </Dialog>
@@ -284,9 +251,9 @@ export default function Account() {
             <Button onClick={() => handleCloseDialog('grantAdmin')} color="primary">
               닫기
             </Button>
-            <Button type="submit" color="primary">
+            <LoadingButton loading={fetching} type="submit" color="primary">
               적용
-            </Button>
+            </LoadingButton>
           </DialogActions>
         </form>
       </Dialog>
@@ -322,9 +289,9 @@ export default function Account() {
             <Button onClick={() => handleCloseDialog('disableAccount')} color="primary">
               닫기
             </Button>
-            <Button type="submit" color="primary">
+            <LoadingButton loading={fetching} type="submit" color="primary">
               적용
-            </Button>
+            </LoadingButton>
           </DialogActions>
         </form>
       </Dialog>

@@ -6,7 +6,6 @@ import {
   Grid,
   Paper,
   Button,
-  Snackbar,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -15,22 +14,19 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import MuiAlert from '@material-ui/lab/Alert';
 import CancelIcon from '@material-ui/icons/Cancel';
 import CheckIcon from '@material-ui/icons/Check';
 import MaterialTable from 'material-table';
 import { options, localization } from './orderTableOptions';
-import useStyles, { CancelButton, ConfirmButton } from './OrderStatus.css';
+import useStyles from './OrderStatus.css';
+import { LoadingButton } from 'base.css';
 import OrderStatusDetail from './OrderStatusDetail';
 import ColorIndicator from './ColorIndicator';
 import { cancelOrder, updateTrackingNumber, updateConfirmCompleted } from 'api';
 import { orderStatus } from 'constants/index';
 import { firestore } from 'configs/firebase';
 import UserContext from 'contexts/UserContext';
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+import useAlert from 'hooks/useAlert';
 
 export default function OrderStatus({ admin }) {
   const classes = useStyles();
@@ -38,20 +34,17 @@ export default function OrderStatus({ admin }) {
   const location = useLocation();
   const { user } = useContext(UserContext);
   const { ORDERED, SENT, COMPLETED, CANCELED } = orderStatus;
+  const { openAlert, renderAlert } = useAlert();
 
   const [data, setData] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
+  const [isActionFetching, setIsActionFetching] = useState(false);
   const [dialogOpen, setDialogOpen] = useState({
     cancelOrderWithReason: false,
     enterTrackingNumber: false,
     confirmCompleted: false,
   });
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [alert, setAlert] = useState({
-    open: false,
-    severity: 'info',
-    message: '',
-  });
 
   const columns = [
     {
@@ -120,6 +113,7 @@ export default function OrderStatus({ admin }) {
   ];
 
   const handleClickOpenDialog = useCallback((dialog) => {
+    setIsActionFetching(false);
     setDialogOpen((prevState) => ({
       ...prevState,
       [dialog]: true,
@@ -133,34 +127,6 @@ export default function OrderStatus({ admin }) {
     }));
   }, []);
 
-  const openAlert = useCallback((message, severity) => {
-    setAlert((prevState) => {
-      let newAlert = { ...prevState };
-      newAlert.open = true;
-      newAlert.message = message;
-      newAlert.severity = severity;
-      return newAlert;
-    });
-  }, []);
-
-  const closeAlert = useCallback(() => {
-    setAlert((prevState) => {
-      let newAlert = { ...prevState };
-      newAlert.open = false;
-      return newAlert;
-    });
-  }, []);
-
-  const handleAlertClose = useCallback(
-    (event, reason) => {
-      if (reason === 'clickaway') {
-        return;
-      }
-      closeAlert();
-    },
-    [closeAlert],
-  );
-
   const handleClickCancelOrder = useCallback(
     (orderNumber) => {
       setSelectedOrder(orderNumber);
@@ -172,6 +138,7 @@ export default function OrderStatus({ admin }) {
   const handleCancelOrder = useCallback(
     async (data) => {
       const { orderCancelReason } = data;
+      setIsActionFetching(true);
       try {
         await cancelOrder(orderCancelReason, selectedOrder);
 
@@ -184,12 +151,12 @@ export default function OrderStatus({ admin }) {
           }
           return newData;
         });
+        handleCloseDialog('cancelOrderWithReason');
         openAlert(`주문이 취소되었습니다. (${selectedOrder})`, 'info');
       } catch (err) {
         console.error(err);
         openAlert(err.message, 'error');
       }
-      handleCloseDialog('cancelOrderWithReason');
       console.log('cancelOrder', orderCancelReason, selectedOrder);
     },
     [handleCloseDialog, selectedOrder, openAlert, CANCELED],
@@ -206,6 +173,7 @@ export default function OrderStatus({ admin }) {
   const handleSubmitTrackingNumber = useCallback(
     async (data) => {
       const { trackingNumber } = data;
+      setIsActionFetching(true);
       try {
         await updateTrackingNumber(trackingNumber, selectedOrder);
 
@@ -218,12 +186,12 @@ export default function OrderStatus({ admin }) {
           }
           return newData;
         });
+        handleCloseDialog('enterTrackingNumber');
         openAlert('운송장 번호가 입력되었습니다. 상태가 발송됨으로 변경됩니다.', 'success');
       } catch (err) {
         console.error(err);
         openAlert(err.message, 'error');
       }
-      handleCloseDialog('enterTrackingNumber');
       console.log('enterTrackingNumber', trackingNumber, selectedOrder);
     },
     [handleCloseDialog, selectedOrder, openAlert, SENT],
@@ -238,6 +206,7 @@ export default function OrderStatus({ admin }) {
   );
 
   const handleSubmitConfirmCompleted = useCallback(async () => {
+    setIsActionFetching(true);
     try {
       await updateConfirmCompleted(selectedOrder);
 
@@ -249,12 +218,12 @@ export default function OrderStatus({ admin }) {
         }
         return newData;
       });
+      handleCloseDialog('confirmCompleted');
       openAlert(`수취 확인되었습니다. (${selectedOrder})`, 'success');
     } catch (err) {
       console.error(err);
       openAlert(err.message, 'error');
     }
-    handleCloseDialog('confirmCompleted');
   }, [handleCloseDialog, selectedOrder, openAlert, COMPLETED]);
 
   // const getOrderData = useCallback(async () => {
@@ -270,10 +239,9 @@ export default function OrderStatus({ admin }) {
 
   useEffect(() => {
     setIsFetching(true);
-    let orderRef = firestore.collection('order');
+    let orderRef = firestore.collection('order').orderBy('created_at', 'desc');
     if (!admin) {
-      console.log(!admin);
-      orderRef = firestore.collection('order').where('client_account_uid', '==', user.uid);
+      orderRef = orderRef.where('client_account_uid', '==', user.uid);
     }
 
     const unsubscribe = orderRef.onSnapshot(
@@ -318,14 +286,24 @@ export default function OrderStatus({ admin }) {
                     </Button>
                   )}
                   {((!admin && status !== SENT && status !== COMPLETED) || admin) && (
-                    <CancelButton variant="contained" startIcon={<CancelIcon />} onClick={() => handleClickCancelOrder(rowData.id)}>
+                    <LoadingButton
+                      customColor="red"
+                      variant="contained"
+                      startIcon={<CancelIcon />}
+                      onClick={() => handleClickCancelOrder(rowData.id)}
+                    >
                       주문 취소 {status === CANCELED && '사유 수정'}
-                    </CancelButton>
+                    </LoadingButton>
                   )}
                   {!admin && status === SENT && (
-                    <ConfirmButton variant="contained" startIcon={<CheckIcon />} onClick={() => handleClickConfirmCompleted(rowData.id)}>
+                    <LoadingButton
+                      customColor="green"
+                      variant="contained"
+                      startIcon={<CheckIcon />}
+                      onClick={() => handleClickConfirmCompleted(rowData.id)}
+                    >
                       수취 확인
-                    </ConfirmButton>
+                    </LoadingButton>
                   )}
                 </OrderStatusDetail>
               );
@@ -337,11 +315,8 @@ export default function OrderStatus({ admin }) {
           />
         </Paper>
       </Grid>
-      <Snackbar open={alert.open} autoHideDuration={3000} onClose={handleAlertClose}>
-        <Alert onClose={handleAlertClose} severity={alert.severity}>
-          {alert.message}
-        </Alert>
-      </Snackbar>
+
+      {renderAlert}
 
       <Dialog
         open={dialogOpen.cancelOrderWithReason}
@@ -369,9 +344,9 @@ export default function OrderStatus({ admin }) {
             <Button type="button" onClick={() => handleCloseDialog('cancelOrderWithReason')} color="primary">
               닫기
             </Button>
-            <CancelButton type="submit" variant="contained" color="primary">
+            <LoadingButton loading={isActionFetching} customColor="red" type="submit" variant="contained">
               주문 취소
-            </CancelButton>
+            </LoadingButton>
           </DialogActions>
         </form>
       </Dialog>
@@ -404,9 +379,9 @@ export default function OrderStatus({ admin }) {
             <Button type="button" onClick={() => handleCloseDialog('enterTrackingNumber')} color="primary">
               닫기
             </Button>
-            <Button type="submit" variant="contained" color="primary">
+            <LoadingButton loading={isActionFetching} type="submit" color="primary">
               운송장 입력
-            </Button>
+            </LoadingButton>
           </DialogActions>
         </form>
       </Dialog>
@@ -421,9 +396,9 @@ export default function OrderStatus({ admin }) {
             <DialogContentText>발주한 상품들을 잘 받으셨나요?</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <ConfirmButton type="submit" variant="contained" color="primary">
+            <LoadingButton loading={isActionFetching} customColor="green" type="submit" variant="contained">
               네 (수취 확인)
-            </ConfirmButton>
+            </LoadingButton>
           </DialogActions>
         </form>
       </Dialog>

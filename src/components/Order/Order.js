@@ -1,41 +1,41 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Grid, Button, Typography, TextField, Paper, Divider, Snackbar, CircularProgress } from '@material-ui/core';
-import MuiAlert from '@material-ui/lab/Alert';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+import {
+  Grid,
+  Button,
+  Typography,
+  TextField,
+  Paper,
+  Divider,
+  CircularProgress,
+  Card,
+  CardActions,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from '@material-ui/core';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import DeleteIcon from '@material-ui/icons/Delete';
 import useStyles from './Order.css';
 import { LoadingButton } from 'base.css';
 import { fetchOrderableItem, createOrder } from 'api';
 import { currencyFormat } from 'utils';
+import useAlert from 'hooks/useAlert';
 
 const TAX_RATE = 0.1;
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 export default function Order() {
   const classes = useStyles();
   const history = useHistory();
+  const { openAlert, renderAlert } = useAlert();
 
   const [data, setData] = useState([]);
   const [basket, setBasket] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState({
-    open: false,
-    severity: 'info',
-    message: '',
-  });
 
   const total = useMemo(() => {
     let sum = 0;
@@ -51,34 +51,6 @@ export default function Order() {
 
     return sum;
   }, [basket]);
-
-  const openAlert = useCallback((message, severity) => {
-    setAlert((prevState) => {
-      let newAlert = { ...prevState };
-      newAlert.open = true;
-      newAlert.message = message;
-      newAlert.severity = severity;
-      return newAlert;
-    });
-  }, []);
-
-  const closeAlert = useCallback(() => {
-    setAlert((prevState) => {
-      let newAlert = { ...prevState };
-      newAlert.open = false;
-      return newAlert;
-    });
-  }, []);
-
-  const handleAlertClose = useCallback(
-    (event, reason) => {
-      if (reason === 'clickaway') {
-        return;
-      }
-      closeAlert();
-    },
-    [closeAlert],
-  );
 
   const handleChangeQuantity = useCallback((e) => {
     e.persist();
@@ -261,15 +233,15 @@ export default function Order() {
               </Table>
             </TableContainer>
           </Grid>
-
           <Grid item xs={12}>
             <LoadingButton
+              fullWidth
+              loading={loading}
               variant="contained"
               size="large"
               color="primary"
               startIcon={<ShoppingCartIcon />}
               onClick={basketOrder}
-              loading={loading}
             >
               발주하기
             </LoadingButton>
@@ -352,11 +324,7 @@ export default function Order() {
         </Grid>
       )}
 
-      <Snackbar open={alert.open} autoHideDuration={3000} onClose={handleAlertClose}>
-        <Alert onClose={handleAlertClose} severity={alert.severity}>
-          {alert.message}
-        </Alert>
-      </Snackbar>
+      {renderAlert}
     </Grid>
   );
 }

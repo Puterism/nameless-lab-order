@@ -23,7 +23,7 @@ const PrivateRoute = ({ children, path, ...rest }) => {
               state: { from: props.location },
             }}
           />
-        ) : isAdmin ? ( // for production -> isAdmin
+        ) : !isAdmin ? ( // for production -> isAdmin
           <Redirect
             to={{
               pathname: '/admin',
