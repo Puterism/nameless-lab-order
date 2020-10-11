@@ -6,6 +6,7 @@ import Item from './Item/Item';
 import Account from './Account/Account';
 import Setting from './Setting/Setting';
 import Notice from './Notice/Notice';
+import NoticeWrite from './Notice/NoticeWrite';
 
 export {
   SignIn,
@@ -16,4 +17,5 @@ export {
   Account,
   Setting,
   Notice,
+  NoticeWrite,
 };

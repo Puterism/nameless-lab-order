@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-d
 import { CssBaseline, createMuiTheme } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { Loading, Main } from './components';
-import { SignIn, Dashboard, OrderStatus, Item, Account, Order, Setting, Notice } from 'containers';
+import { SignIn, Dashboard, OrderStatus, Item, Account, Order, Setting, Notice, NoticeWrite } from 'containers';
 import UserContext from 'contexts/UserContext';
 import useAuth from 'hooks/useAuth';
 
@@ -134,6 +134,9 @@ function App() {
                 </AdminRoute>
                 <AdminRoute exact path="/admin/notice">
                   <Notice admin />
+                </AdminRoute>
+                <AdminRoute exact path="/admin/notice/write">
+                  <NoticeWrite />
                 </AdminRoute>
 
                 <PrivateRoute exact path="/">
