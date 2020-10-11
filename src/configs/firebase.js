@@ -3,6 +3,7 @@ import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/database';
 import 'firebase/functions';
+import 'firebase/storage';
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -20,6 +21,7 @@ const auth = new firebase.auth();
 const firestore = new firebase.firestore();
 const database = new firebase.database();
 const functions = new firebase.functions();
+const storage = new firebase.storage();
 
 if (window.location.hostname === 'localhost') {
   firestore.settings({
@@ -30,4 +32,4 @@ if (window.location.hostname === 'localhost') {
   functions.useFunctionsEmulator('http://localhost:5001');
 }
 
-export { firebase, auth, firestore, database, functions };
+export { firebase, auth, firestore, database, functions, storage };

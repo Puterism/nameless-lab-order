@@ -85,7 +85,13 @@ export default function Item() {
           <FormControlLabel
             label={available ? '가능' : '불가능'}
             value={available ? true : false}
-            control={<Switch color="primary" checked={available ? 'checked' : ''} value={available ? true : false} />}
+            control={
+              <Switch
+                color="primary"
+                checked={available ? 'checked' : ''}
+                value={available ? true : false}
+              />
+            }
             onChange={(event) => props.onChange(event.target.checked)}
           />
         );

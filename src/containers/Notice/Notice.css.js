@@ -4,7 +4,7 @@ const useStyles = makeStyles((theme) => ({
   header: {
     fontSize: '1.6em',
     fontWeight: 'bold',
-	},
+  },
 }));
 
 export default useStyles;
