@@ -21,9 +21,13 @@ export default function Main({ children }) {
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
-          { children }
+          {children}
         </Container>
       </main>
     </div>
   );
 }
+
+Main.defaultProps = {
+  children: null,
+};

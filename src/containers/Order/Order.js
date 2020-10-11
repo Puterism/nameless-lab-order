@@ -21,7 +21,7 @@ import {
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import DeleteIcon from '@material-ui/icons/Delete';
 import useStyles from './Order.css';
-import { LoadingButton } from 'base.css';
+import { LoadingButton } from 'components';
 import { fetchOrderableItem, createOrder } from 'api';
 import { currencyFormat } from 'utils';
 import useAlert from 'hooks/useAlert';

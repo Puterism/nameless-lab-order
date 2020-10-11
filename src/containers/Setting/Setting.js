@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from '@material-ui/core';
 import useStyles from './Setting.css';
-import { LoadingButton } from 'base.css';
+import { LoadingButton } from 'components';
 import useAlert from 'hooks/useAlert';
 
 export default function Setting() {
@@ -59,7 +59,12 @@ export default function Setting() {
             </Typography>
           </CardContent>
           <CardContent>
-            <Button variant="contained" size="large" color="primary" onClick={() => handleClickOpenDialog('editProfile')}>
+            <Button
+              variant="contained"
+              size="large"
+              color="primary"
+              onClick={() => handleClickOpenDialog('editProfile')}
+            >
               정보 수정
             </Button>
           </CardContent>
@@ -76,7 +81,12 @@ export default function Setting() {
             </Typography>
           </CardContent>
           <CardContent>
-            <Button variant="contained" size="large" color="primary" onClick={() => handleClickOpenDialog('changePassword')}>
+            <Button
+              variant="contained"
+              size="large"
+              color="primary"
+              onClick={() => handleClickOpenDialog('changePassword')}
+            >
               비밀번호 변경
             </Button>
           </CardContent>
@@ -85,18 +95,49 @@ export default function Setting() {
 
       {renderAlert}
 
-      <Dialog open={dialogOpen.editProfile} onClose={() => handleCloseDialog('editProfile')} aria-labelledby="create-account-edit-profile">
-        <DialogTitle id="create-account-edit-profile">계정 정보 수정</DialogTitle>
+      <Dialog
+        open={dialogOpen.editProfile}
+        onClose={() => handleCloseDialog('editProfile')}
+        aria-labelledby="create-account-edit-profile"
+      >
+        <DialogTitle id="create-account-edit-profile">
+          계정 정보 수정
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText>발주처명과 로그인에 사용될 이메일 주소를 입력해주세요. 기본 비밀번호는 nameless 입니다.</DialogContentText>
-          <TextField type="text" fullWidth margin="dense" name="name" id="name" label="발주처명" autoFocus />
-          <TextField type="email" fullWidth margin="dense" name="email" id="email" label="이메일" />
+          <DialogContentText>
+            발주처명과 로그인에 사용될 이메일 주소를 입력해주세요. 기본
+            비밀번호는 nameless 입니다.
+          </DialogContentText>
+          <TextField
+            type="text"
+            fullWidth
+            margin="dense"
+            name="name"
+            id="name"
+            label="발주처명"
+            autoFocus
+          />
+          <TextField
+            type="email"
+            fullWidth
+            margin="dense"
+            name="email"
+            id="email"
+            label="이메일"
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => handleCloseDialog('editProfile')} color="primary">
+          <Button
+            onClick={() => handleCloseDialog('editProfile')}
+            color="primary"
+          >
             닫기
           </Button>
-          <LoadingButton loading={fetching} onClick={() => handleCloseDialog('editProfile')} color="primary">
+          <LoadingButton
+            loading={fetching}
+            onClick={() => handleCloseDialog('editProfile')}
+            color="primary"
+          >
             계정 생성
           </LoadingButton>
         </DialogActions>
@@ -106,16 +147,34 @@ export default function Setting() {
         onClose={() => handleCloseDialog('changePassword')}
         aria-labelledby="change-password-dialog-title"
       >
-        <DialogTitle id="change-password-dialog-title">비밀번호 변경</DialogTitle>
+        <DialogTitle id="change-password-dialog-title">
+          비밀번호 변경
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText>비밀번호를 변경하기 위해 이전 비밀번호를 입력해주세요</DialogContentText>
-          <TextField type="email" fullWidth margin="dense" name="email" id="email" label="이메일" />
+          <DialogContentText>
+            비밀번호를 변경하기 위해 이전 비밀번호를 입력해주세요
+          </DialogContentText>
+          <TextField
+            type="email"
+            fullWidth
+            margin="dense"
+            name="email"
+            id="email"
+            label="이메일"
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => handleCloseDialog('changePassword')} color="primary">
+          <Button
+            onClick={() => handleCloseDialog('changePassword')}
+            color="primary"
+          >
             닫기
           </Button>
-          <LoadingButton loading={fetching} onClick={() => handleCloseDialog('changePassword')} color="primary">
+          <LoadingButton
+            loading={fetching}
+            onClick={() => handleCloseDialog('changePassword')}
+            color="primary"
+          >
             비밀번호 변경
           </LoadingButton>
         </DialogActions>

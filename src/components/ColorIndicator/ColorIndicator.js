@@ -5,3 +5,7 @@ export default function ColorIndicator(props) {
   const classes = useStyles(props);
   return <div className={classes.dot} color={props.color}></div>;
 }
+
+ColorIndicator.defaultProps = {
+  color: 'gray',
+};

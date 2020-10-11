@@ -18,7 +18,7 @@ import {
   RadioGroup,
 } from '@material-ui/core';
 import useStyles from './Account.css';
-import { LoadingButton } from 'base.css';
+import { LoadingButton } from 'components';
 import { createAccount, grantAdmin, releaseAdmin, disableAccount, enableAccount } from 'api';
 import useAlert from 'hooks/useAlert';
 

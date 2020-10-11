@@ -5,9 +5,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import { red, green } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
-  buttonWrapper: {
-    // width: '100%',
-  },
   red: {
     color: theme.palette.getContrastText(red[700]),
     backgroundColor: red[700],
@@ -24,14 +21,29 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const LoadingButton = ({ loading, children, customColor, ...rest }) => {
+export default function LoadingButton({
+  loading,
+  children,
+  customColor,
+  ...rest
+}) {
   const classes = useStyles();
 
-  const buttonClassName = clsx([classes.buttonWrapper, customColor === 'red' && classes.red, customColor === 'green' && classes.green]);
+  const buttonClassName = clsx([
+    classes.buttonWrapper,
+    customColor === 'red' && classes.red,
+    customColor === 'green' && classes.green,
+  ]);
 
   return (
     <Button className={buttonClassName} {...rest} disabled={loading}>
       {loading ? <CircularProgress color="inherit" size="1.7em" /> : children}
     </Button>
   );
+}
+
+LoadingButton.defaultProps = {
+  loading: false,
+  children: null,
+  customColor: null,
 };

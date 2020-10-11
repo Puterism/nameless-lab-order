@@ -24,6 +24,9 @@
     "recharts": "^1.8.5",
     "styled-components": "^5.1.1"
   },
+  "devDependencies": {
+    "eslint-config-prettier": "^6.11.0"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -32,7 +35,24 @@
     "db": "firebase emulators:start --import=./emulators --export-on-exit"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "prettier"
+    ],
+    "rules": {
+      "array-element-newline": [
+        "error",
+        {
+          "ArrayExpression": "consistent",
+          "ArrayPattern": {
+            "minItems": 3
+          }
+        }
+      ]
+    },
+    "env": {
+      "browser": true
+    }
   },
   "browserslist": {
     "production": [

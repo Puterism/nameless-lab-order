@@ -34,3 +34,8 @@ function Header({ open, onDrawerOpen }) {
 }
 
 export default Header;
+
+Header.defaultProps = {
+  open: true,
+  onDrawerOpen: () => null,
+};
