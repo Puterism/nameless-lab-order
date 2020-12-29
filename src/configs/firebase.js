@@ -1,4 +1,4 @@
-import * as firebase from 'firebase/app';
+import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/database';
@@ -30,6 +30,7 @@ if (window.location.hostname === 'localhost') {
   });
 
   functions.useFunctionsEmulator('http://localhost:5001');
+  auth.useEmulator('http://localhost:9099/');
 }
 
 export { firebase, auth, firestore, database, functions, storage };

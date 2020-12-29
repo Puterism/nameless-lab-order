@@ -8,6 +8,8 @@ admin.initializeApp({
   storageBucket: 'nameless-lab-order.appspot.com',
 });
 
+exports.notice = require('./src/notice');
+
 exports.createOrder = functions
   .region('asia-northeast2')
   .https.onCall(async (data, context) => {
@@ -286,8 +288,34 @@ async function enableUserPromise(email) {
   });
 }
 
-exports.createNotice = functions
-  .region('asia-northeast2')
-  .https.onCall((title, data, context) => {
-    // TODO:
-  });
+// exports.getNotices = functions.region('asia-northeast2').https.onCall(() => {
+//   return admin
+//     .firestore()
+//     .collection('notice')
+//     .orderBy('created_at', 'desc')
+//     .get()
+//     .then((querySnapshot) => {
+//       const result = [];
+//       querySnapshot.forEach((doc) => {
+//         const data = doc.data();
+//         const created_at = data.created_at.toDate() + '';
+//         result.push({
+//           id: doc.id,
+//           title: data.title,
+//           data: data.data,
+//           created_at: created_at,
+//         });
+//       });
+//       console.log(result);
+//       return result;
+//     })
+//     .catch((err) => {
+//       throw new functions.https.HttpsError('internal', err);
+//     });
+// });
+
+// exports.changePassword = functions
+//   .region('asia-northeast2')
+//   .https.onCall((currentPassword, newPassword) => {
+
+//   });

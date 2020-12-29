@@ -1,143 +1,139 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Grid,
-  Typography,
-  Button,
-  Card,
-  CardHeader,
-  CardContent,
-  CardActions,
-  IconButton,
-  TextField,
-} from '@material-ui/core';
+import React, { useState, useCallback } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { Grid, Typography, TextField } from '@material-ui/core';
 import DoneIcon from '@material-ui/icons/Done';
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+// import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
 // import Image from '@ckeditor/ckeditor5-image/src/image';
 // import ImageToolbar from '@ckeditor/ckeditor5-image/src/imagetoolbar';
 // import ImageCaption from '@ckeditor/ckeditor5-image/src/imagecaption';
 // import ImageStyle from '@ckeditor/ckeditor5-image/src/imagestyle';
 // import ImageResize from '@ckeditor/ckeditor5-image/src/imageresize';
-// import '@ckeditor/ckeditor5-image/theme'
+// import '@ckeditor/ckeditor5-image/theme';
 import '@ckeditor/ckeditor5-build-classic/build/translations/ko';
 import useStyles from './Notice.css';
 import { firebase } from 'configs/firebase';
-
-class FirebaseUploadAdapter {
-  constructor(loader) {
-    this.loader = loader;
-  }
-  // Starts the upload process.
-  upload() {
-    return this.loader.file.then(
-      (file) =>
-        new Promise((resolve, reject) => {
-          let storage = firebase.storage().ref();
-          let uploadTask = storage.child(file.name).put(file);
-          uploadTask.on(
-            firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
-            function (snapshot) {
-              // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-              var progress =
-                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              console.log('Upload is ' + progress + '% done');
-              switch (snapshot.state) {
-                case firebase.storage.TaskState.PAUSED: // or 'paused'
-                  console.log('Upload is paused');
-                  break;
-                case firebase.storage.TaskState.RUNNING: // or 'running'
-                  console.log('Upload is running');
-                  break;
-              }
-            },
-            function (error) {
-              // A full list of error codes is available at
-              // https://firebase.google.com/docs/storage/web/handle-errors
-              // eslint-disable-next-line default-case
-              switch (error.code) {
-                case 'storage/unauthorized':
-                  reject(" User doesn't have permission to access the object");
-                  break;
-
-                case 'storage/canceled':
-                  reject('User canceled the upload');
-                  break;
-
-                case 'storage/unknown':
-                  reject(
-                    'Unknown error occurred, inspect error.serverResponse',
-                  );
-                  break;
-              }
-            },
-            function () {
-              // Upload completed successfully, now we can get the download URL
-              uploadTask.snapshot.ref
-                .getDownloadURL()
-                .then(function (downloadURL) {
-                  // console.log("File available at", downloadURL);
-                  resolve({
-                    default: downloadURL,
-                  });
-                });
-            },
-          );
-        }),
-    );
-  }
-}
+import { FirebaseUploadAdapter } from 'utils';
+import { LoadingButton } from 'components';
 
 export default function Notice() {
   const classes = useStyles();
-  const [ckeditorData, setCkeditorData] = useState(null);
+  const history = useHistory();
+  const { register, handleSubmit, setValue } = useForm();
+  const [loading, setLoading] = useState(false);
+  const { state } = useLocation();
 
-  const handleSubmit = useCallback((e) => {
-    e.preventDefault();
-    // TODO : 글 업로드
+  const createNotice = useCallback(async (newItem) => {
+    const _createNotice = firebase.functions().httpsCallable('notice-createArticle');
+    try {
+      await _createNotice(newItem);
+    } catch (err) {
+      console.error(err);
+    }
   }, []);
 
-  useEffect(() => {
-    console.log(ckeditorData);
-  }, [ckeditorData]);
+  const updateNotice = useCallback(async (newItem, id) => {
+    const _updateNotice = firebase.functions().httpsCallable('notice-updateArticle');
+    try {
+      await _updateNotice({ newItem, id });
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const handleSubmitNotice = useCallback(
+    async (data) => {
+      setLoading(true);
+
+      const { title, ckeditorData } = data;
+
+      if (!ckeditorData) {
+        setLoading(false);
+        return false;
+      }
+
+      const newItem = {
+        title,
+        data: ckeditorData,
+      };
+
+      if (state) {
+        await updateNotice(newItem, state.article.id);
+      } else {
+        await createNotice(newItem);
+      }
+
+      setLoading(false);
+
+      history.push({
+        pathname: '/admin/notice',
+      });
+    },
+    [createNotice, history, state, updateNotice],
+  );
 
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
         <Typography varient="h5" component="h2" className={classes.header}>
-          공지사항
+          공지사항 {state ? '수정' : '작성'}
         </Typography>
       </Grid>
       <Grid item xs={12}>
-        <form autoComplete="off" onSubmit={handleSubmit}>
-          <Button
+        <form autoComplete="off" onSubmit={handleSubmit(handleSubmitNotice)}>
+          <LoadingButton
             type="submit"
             variant="contained"
             color="primary"
             size="large"
             startIcon={<DoneIcon />}
+            loading={loading}
           >
-            올리기
-          </Button>
-          <TextField label="제목" fullWidth margin="normal" />
+            {state ? '수정하기' : '올리기'}
+          </LoadingButton>
+          <TextField
+            label="제목"
+            fullWidth
+            margin="normal"
+            name="title"
+            defaultValue={state && state.article.title}
+            inputRef={register({
+              required: 'Required',
+            })}
+          />
           <CKEditor
+            name="title"
+            inputRef={register}
             editor={ClassicEditor}
-            plugin={[Image]}
             config={{
+              // plugins: [
+              //   // Image,
+              //   // ImageCaption,
+              //   // ImageStyle,
+              //   // ImageToolbar,
+              //   // Essentials,
+              //   // ImageResize,
+              // ],
               language: 'ko',
             }}
-            data="<p>Hello from CKEditor 5!</p>"
+            data={state ? state.article.data : ''}
             onInit={(editor) => {
+              register('ckeditorData');
+
               const data = editor.getData();
-              setCkeditorData(data);
-              editor.plugins.get('FileRepository').createUploadAdapter = (
-                loader,
-              ) => {
+              console.log(`onInit: ${data}`);
+              // setCkeditorData(data);
+              setValue('ckeditorData', data);
+              editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
                 return new FirebaseUploadAdapter(loader);
               };
             }}
             onChange={(event, editor) => {
               const data = editor.getData();
-              setCkeditorData(data);
+              // setCkeditorData(data);
+              setValue('ckeditorData', data);
               console.log({ event, editor, data });
             }}
             onBlur={(event, editor) => {

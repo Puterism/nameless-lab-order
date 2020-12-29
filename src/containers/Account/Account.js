@@ -19,7 +19,13 @@ import {
 } from '@material-ui/core';
 import useStyles from './Account.css';
 import { LoadingButton } from 'components';
-import { createAccount, grantAdmin, releaseAdmin, disableAccount, enableAccount } from 'api';
+import {
+  createAccount,
+  grantAdmin,
+  releaseAdmin,
+  disableAccount,
+  enableAccount,
+} from 'api';
 import useAlert from 'hooks/useAlert';
 
 export default function Account() {
@@ -136,7 +142,12 @@ export default function Account() {
             </Typography>
           </CardContent>
           <CardContent>
-            <Button variant="contained" size="large" color="primary" onClick={() => handleClickOpenDialog('createAccount')}>
+            <Button
+              variant="contained"
+              size="large"
+              color="primary"
+              onClick={() => handleClickOpenDialog('createAccount')}
+            >
               계정 생성
             </Button>
           </CardContent>
@@ -149,11 +160,17 @@ export default function Account() {
               관리자 지정/해제
             </Typography>
             <Typography component="p" gutterBottom>
-              계정을 관리자로 지정하거나 해제합니다. 관리자 계정으로 로그인할 경우 관리자 화면으로 접속됩니다.
+              계정을 관리자로 지정하거나 해제합니다. 관리자 계정으로 로그인할
+              경우 관리자 화면으로 접속됩니다.
             </Typography>
           </CardContent>
           <CardContent>
-            <Button variant="contained" size="large" color="primary" onClick={() => handleClickOpenDialog('grantAdmin')}>
+            <Button
+              variant="contained"
+              size="large"
+              color="primary"
+              onClick={() => handleClickOpenDialog('grantAdmin')}
+            >
               관리자 지정/해제
             </Button>
           </CardContent>
@@ -166,11 +183,17 @@ export default function Account() {
               계정 활성화/비활성화
             </Typography>
             <Typography component="p" gutterBottom>
-              로그인할 수 없도록 계정을 비활성화합니다. 비활성화된 계정을 다시 활성화할 수 있습니다.
+              로그인할 수 없도록 계정을 비활성화합니다. 비활성화된 계정을 다시
+              활성화할 수 있습니다.
             </Typography>
           </CardContent>
           <CardContent>
-            <Button variant="contained" size="large" color="primary" onClick={() => handleClickOpenDialog('disableAccount')}>
+            <Button
+              variant="contained"
+              size="large"
+              color="primary"
+              onClick={() => handleClickOpenDialog('disableAccount')}
+            >
               계정 활성화/비활성화
             </Button>
           </CardContent>
@@ -187,7 +210,10 @@ export default function Account() {
         <form onSubmit={handleSubmit(handleSubmitCreateAccount)}>
           <DialogTitle id="create-account-dialog-title">계정 생성</DialogTitle>
           <DialogContent>
-            <DialogContentText>발주처명과 로그인에 사용될 이메일 주소를 입력해주세요. 기본 비밀번호는 nameless 입니다.</DialogContentText>
+            <DialogContentText>
+              발주처명과 로그인에 사용될 이메일 주소를 입력해주세요. 기본
+              비밀번호는 nameless 입니다.
+            </DialogContentText>
             <TextField
               type="text"
               fullWidth
@@ -209,7 +235,11 @@ export default function Account() {
             />
           </DialogContent>
           <DialogActions>
-            <Button type="button" onClick={() => handleCloseDialog('createAccount')} color="primary">
+            <Button
+              type="button"
+              onClick={() => handleCloseDialog('createAccount')}
+              color="primary"
+            >
               닫기
             </Button>
             <LoadingButton loading={fetching} type="submit" color="primary">
@@ -218,11 +248,19 @@ export default function Account() {
           </DialogActions>
         </form>
       </Dialog>
-      <Dialog open={dialogOpen.grantAdmin} onClose={() => handleCloseDialog('grantAdmin')} aria-labelledby="grant-admin-dialog-title">
+      <Dialog
+        open={dialogOpen.grantAdmin}
+        onClose={() => handleCloseDialog('grantAdmin')}
+        aria-labelledby="grant-admin-dialog-title"
+      >
         <form onSubmit={handleSubmit(handleSubmitGrantAdmin)}>
-          <DialogTitle id="grant-admin-dialog-title">관리자 지정/해제</DialogTitle>
+          <DialogTitle id="grant-admin-dialog-title">
+            관리자 지정/해제
+          </DialogTitle>
           <DialogContent>
-            <DialogContentText>관리자로 지정하거나 해제할 계정의 이메일을 입력해주세요</DialogContentText>
+            <DialogContentText>
+              관리자로 지정하거나 해제할 계정의 이메일을 입력해주세요
+            </DialogContentText>
             <FormControl component="fieldset">
               <Controller
                 as={RadioGroup}
@@ -232,8 +270,16 @@ export default function Account() {
                 control={control}
                 defaultValue="assign"
               >
-                <FormControlLabel value="assign" control={<Radio color="primary" />} label="관리자 지정" />
-                <FormControlLabel value="release" control={<Radio color="primary" />} label="관리자 해제" />
+                <FormControlLabel
+                  value="assign"
+                  control={<Radio color="primary" />}
+                  label="관리자 지정"
+                />
+                <FormControlLabel
+                  value="release"
+                  control={<Radio color="primary" />}
+                  label="관리자 해제"
+                />
               </Controller>
             </FormControl>
             <TextField
@@ -248,7 +294,10 @@ export default function Account() {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => handleCloseDialog('grantAdmin')} color="primary">
+            <Button
+              onClick={() => handleCloseDialog('grantAdmin')}
+              color="primary"
+            >
               닫기
             </Button>
             <LoadingButton loading={fetching} type="submit" color="primary">
@@ -263,15 +312,33 @@ export default function Account() {
         aria-labelledby="disable-account-dialog-title"
       >
         <form onSubmit={handleSubmit(handleSubmitDisableAccount)}>
-          <DialogTitle id="disable-account-dialog-title">계정 활성화/비활성화</DialogTitle>
+          <DialogTitle id="disable-account-dialog-title">
+            계정 활성화/비활성화
+          </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              비활성화 혹은 활성화할 계정의 이메일을 입력해주세요. 계정을 비활성화할 경우 활성화하기 전까지 더 이상 로그인할 수 없습니다.
+              비활성화 혹은 활성화할 계정의 이메일을 입력해주세요. 계정을
+              비활성화할 경우 활성화하기 전까지 더 이상 로그인할 수 없습니다.
             </DialogContentText>
             <FormControl component="fieldset">
-              <Controller as={RadioGroup} row aria-label="select-enable-or-disable" name="select" control={control} defaultValue="disable">
-                <FormControlLabel value="disable" control={<Radio color="primary" />} label="비활성화" />
-                <FormControlLabel value="enable" control={<Radio color="primary" />} label="활성화" />
+              <Controller
+                as={RadioGroup}
+                row
+                aria-label="select-enable-or-disable"
+                name="select"
+                control={control}
+                defaultValue="disable"
+              >
+                <FormControlLabel
+                  value="disable"
+                  control={<Radio color="primary" />}
+                  label="비활성화"
+                />
+                <FormControlLabel
+                  value="enable"
+                  control={<Radio color="primary" />}
+                  label="활성화"
+                />
               </Controller>
             </FormControl>
             <TextField
@@ -286,7 +353,10 @@ export default function Account() {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => handleCloseDialog('disableAccount')} color="primary">
+            <Button
+              onClick={() => handleCloseDialog('disableAccount')}
+              color="primary"
+            >
               닫기
             </Button>
             <LoadingButton loading={fetching} type="submit" color="primary">

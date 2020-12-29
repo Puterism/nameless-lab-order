@@ -5,7 +5,9 @@ import { orderStatus } from 'constants/index';
 const TAX_RATE = 0.1;
 
 export const fetchAdminCustomClaim = async (uid) => {
-  const getAdminCustomClaim = firebase.functions().httpsCallable('getAdminCustomClaim');
+  const getAdminCustomClaim = firebase
+    .functions()
+    .httpsCallable('getAdminCustomClaim');
   try {
     const adminCustomClaim = await getAdminCustomClaim(uid);
     console.log(adminCustomClaim);
@@ -135,7 +137,10 @@ export const fetchProfile = async () => {
 export const fetchItems = async () => {
   let items = [];
   try {
-    const querySnapshot = await firestore.collection('item').orderBy('created_at', 'asc').get();
+    const querySnapshot = await firestore
+      .collection('item')
+      .orderBy('created_at', 'asc')
+      .get();
     querySnapshot.forEach((doc) => {
       const item = doc.data();
       item.id = doc.id;
@@ -283,7 +288,9 @@ export const createOrder = async (items) => {
   const order_number = generateOrderNumber();
   const { ORDERED } = orderStatus;
 
-  const total = items.map(({ price, orderQuantity }) => price * orderQuantity).reduce((sum, i) => sum + i, 0);
+  const total = items
+    .map(({ price, orderQuantity }) => price * orderQuantity)
+    .reduce((sum, i) => sum + i, 0);
   const subtotal = total * (1 - TAX_RATE);
 
   const data = {
@@ -296,7 +303,9 @@ export const createOrder = async (items) => {
     status: ORDERED,
   };
 
-  const createOrderFunctions = firebase.functions().httpsCallable('createOrder');
+  const createOrderFunctions = firebase
+    .functions()
+    .httpsCallable('createOrder');
 
   try {
     const response = await createOrderFunctions(data);
@@ -316,8 +325,13 @@ export const createOrder = async (items) => {
 export const fetchOrders = async (limitCount = 0) => {
   let orders = [];
   try {
-    const queryRef = await firestore.collection('order').orderBy('created_at', 'desc');
-    const querySnapshot = limitCount > 0 ? await queryRef.limit(limitCount).get() : await queryRef.get();
+    const queryRef = await firestore
+      .collection('order')
+      .orderBy('created_at', 'desc');
+    const querySnapshot =
+      limitCount > 0
+        ? await queryRef.limit(limitCount).get()
+        : await queryRef.get();
     querySnapshot.forEach((doc) => {
       const order = doc.data();
       order.id = doc.id;
@@ -334,8 +348,13 @@ export const fetchOrdersListener = async (limitCount = 0) => {
   let orderData = [];
 
   try {
-    const queryRef = await firestore.collection('order').orderBy('created_at', 'desc');
-    const queryOnSnapshot = limitCount > 0 ? await queryRef.limit(limitCount).onSnapshot : await queryRef.onSnapshot;
+    const queryRef = await firestore
+      .collection('order')
+      .orderBy('created_at', 'desc');
+    const queryOnSnapshot =
+      limitCount > 0
+        ? await queryRef.limit(limitCount).onSnapshot
+        : await queryRef.onSnapshot;
     const unsubscribe = queryOnSnapshot(
       (snapshot) => {
         orderData = snapshot.docs.map((doc) => ({
@@ -413,7 +432,9 @@ export const updateTrackingNumber = async (trackingNumber, orderNumber) => {
     }
 
     if (status === COMPLETED || status === CANCELED) {
-      throw new Error('발주 상태가 취소되었거나 완료된 경우 발송됨 처리를 할 수 없습니다');
+      throw new Error(
+        '발주 상태가 취소되었거나 완료된 경우 발송됨 처리를 할 수 없습니다',
+      );
     }
     await orderRef.update({
       status: SENT,
@@ -456,3 +477,37 @@ export const updateConfirmCompleted = async (orderNumber) => {
 };
 
 /***** END Order Status *****/
+
+/***** Settings *****/
+
+export const updateProfile = async (profile) => {
+  const { displayName } = profile;
+  const user = firebase.auth().currentUser;
+
+  try {
+    await user.updateProfile({
+      displayName,
+    });
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const changePassword = async (currentPassword, newPassword) => {
+  const user = firebase.auth().currentUser;
+  const credential = firebase.auth.EmailAuthProvider.credential(
+    user.email,
+    currentPassword,
+  );
+
+  try {
+    await user.reauthenticateWithCredential(credential);
+    await user.updatePassword(newPassword);
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+/***** END Settings *****/
