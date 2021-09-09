@@ -22,8 +22,6 @@ const firestore = new firebase.firestore();
 const database = new firebase.database();
 const storage = new firebase.storage();
 
-new firebase.functions();
-
 const functions = firebase.app().functions('asia-northeast2');
 
 if (window.location.hostname === 'localhost') {
