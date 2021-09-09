@@ -1,24 +1,9 @@
 import React, { useContext } from 'react';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import { CssBaseline, createMuiTheme } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { Loading, Main } from './components';
-import {
-  SignIn,
-  Dashboard,
-  OrderStatus,
-  Item,
-  Account,
-  Order,
-  Setting,
-  Notice,
-  NoticeWrite,
-} from 'containers';
+import { SignIn, Dashboard, OrderStatus, Item, Account, Order, Setting, Notice, NoticeWrite } from 'containers';
 import UserContext from 'contexts/UserContext';
 import useAuth from 'hooks/useAuth';
 
@@ -39,7 +24,7 @@ const PrivateRoute = ({ children, path, ...rest }) => {
               state: { from: props.location },
             }}
           />
-        ) : !isAdmin ? ( // for production -> isAdmin
+        ) : isAdmin ? ( // for production -> isAdmin
           <Redirect
             to={{
               pathname: '/admin',
@@ -131,7 +116,7 @@ function App() {
             <Route exact path="/login">
               <SignIn />
             </Route>
-            <Main>
+            <Main admin={isAdmin}>
               <Switch>
                 <AdminRoute exact path="/admin">
                   <Dashboard admin />
