@@ -20,8 +20,11 @@ firebase.initializeApp(config);
 const auth = new firebase.auth();
 const firestore = new firebase.firestore();
 const database = new firebase.database();
-const functions = new firebase.functions();
 const storage = new firebase.storage();
+
+new firebase.functions();
+
+const functions = firebase.app().functions('asia-northeast2');
 
 if (window.location.hostname === 'localhost') {
   firestore.settings({
@@ -29,8 +32,9 @@ if (window.location.hostname === 'localhost') {
     ssl: false,
   });
 
-  functions.useFunctionsEmulator('http://localhost:5001');
   auth.useEmulator('http://localhost:9099/');
+  functions.useEmulator('localhost', 5001);
+  storage.useEmulator('localhost', 9199);
 }
 
 export { firebase, auth, firestore, database, functions, storage };

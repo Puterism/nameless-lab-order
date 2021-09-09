@@ -22,7 +22,7 @@ import dayjs from 'dayjs';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import useStyles from './Notice.css';
-import { firebase, firestore } from 'configs/firebase';
+import { firestore, functions } from 'configs/firebase';
 
 export default function Notice({ admin }) {
   const classes = useStyles();
@@ -51,7 +51,8 @@ export default function Notice({ admin }) {
   };
 
   const handleDeleteNotice = async (id) => {
-    const _deleteNotice = firebase.functions().httpsCallable('notice-deleteArticle');
+    const _deleteNotice = functions.httpsCallable('notice-deleteArticle');
+
     try {
       await _deleteNotice({ id });
       handleCloseArticleMenu();

@@ -1,13 +1,11 @@
-import { firebase, firestore } from 'configs/firebase';
+import { firebase, firestore, functions } from 'configs/firebase';
 import { generateOrderNumber } from 'utils';
 import { orderStatus } from 'constants/index';
 
 const TAX_RATE = 0.1;
 
 export const fetchAdminCustomClaim = async (uid) => {
-  const getAdminCustomClaim = firebase
-    .functions()
-    .httpsCallable('getAdminCustomClaim');
+  const getAdminCustomClaim = functions.httpsCallable('getAdminCustomClaim');
   try {
     const adminCustomClaim = await getAdminCustomClaim(uid);
     console.log(adminCustomClaim);
@@ -19,8 +17,6 @@ export const fetchAdminCustomClaim = async (uid) => {
 };
 
 /***** Account *****/
-export const fetchAccounts = async () => {};
-
 export const updateAccountName = async (user, name) => {
   user
     .updateProfile({
@@ -37,7 +33,7 @@ export const updateAccountName = async (user, name) => {
 };
 
 export const createAccount = async (name, email, password) => {
-  const createUser = firebase.functions().httpsCallable('createAccount');
+  const createUser = functions.httpsCallable('createAccount');
 
   try {
     const response = await createUser({ displayName: name, email, password });
@@ -48,29 +44,10 @@ export const createAccount = async (name, email, password) => {
   }
 
   return true;
-
-  // firebase
-  //   .auth()
-  //   .createUserWithEmailAndPassword(email, password)
-  //   .then((user) => {
-  //     updateAccountName(user, name);
-  //     // const userRef = database.ref(`accounts/${user.uid}`);
-  //     // userRef.set({
-  //     //   email: user.email,
-  //     //   name: name,
-  //     // });
-
-  //     return user;
-  //   })
-  //   .catch((error) => {
-  //     const errorCode = error.code;
-  //     const errorMessage = error.message;
-  //     console.error(errorCode, errorMessage);
-  //   });
 };
 
 export const grantAdmin = async (email) => {
-  const setAdmin = firebase.functions().httpsCallable('setAdmin');
+  const setAdmin = functions.httpsCallable('setAdmin');
 
   try {
     const response = await setAdmin(email);
@@ -84,7 +61,7 @@ export const grantAdmin = async (email) => {
 };
 
 export const releaseAdmin = async (email) => {
-  const unsetAdmin = firebase.functions().httpsCallable('unsetAdmin');
+  const unsetAdmin = functions.httpsCallable('unsetAdmin');
 
   try {
     const response = await unsetAdmin(email);
@@ -98,7 +75,7 @@ export const releaseAdmin = async (email) => {
 };
 
 export const disableAccount = async (email) => {
-  const disableUser = firebase.functions().httpsCallable('disableUser');
+  const disableUser = functions.httpsCallable('disableUser');
 
   try {
     const response = await disableUser(email);
@@ -112,7 +89,7 @@ export const disableAccount = async (email) => {
 };
 
 export const enableAccount = async (email) => {
-  const enableUser = firebase.functions().httpsCallable('enableUser');
+  const enableUser = functions.httpsCallable('enableUser');
 
   try {
     const response = await enableUser(email);
@@ -137,10 +114,7 @@ export const fetchProfile = async () => {
 export const fetchItems = async () => {
   let items = [];
   try {
-    const querySnapshot = await firestore
-      .collection('item')
-      .orderBy('created_at', 'asc')
-      .get();
+    const querySnapshot = await firestore.collection('item').orderBy('created_at', 'asc').get();
     querySnapshot.forEach((doc) => {
       const item = doc.data();
       item.id = doc.id;
@@ -152,27 +126,6 @@ export const fetchItems = async () => {
   }
   return items;
 };
-
-// export const fetchItemsWithPagination = async (page, count) => {
-//   let fetchedData = {};
-
-//   try {
-//     const first = firestore.collection('item').orderBy('created_at', 'asc');
-//     const snapshot = await first.get();
-//     const totalCount = snapshot.docs.length;
-//     const last = snapshot.docs[totalCount - 1];
-//     const next = firestore.collection('item').orderBy('created_at', 'asc').startAfter(page).limit(count);
-
-//     // querySnapshot.forEach((doc) => {
-//     //   const item = doc.data();
-//     //   item.id = doc.id;
-//     //   items.push(item);
-//     // });
-//   } catch (err) {
-//     console.error('Error fetch document: ', err);
-//   }
-//   return fetchedData;
-// };
 
 export const createItem = async (item) => {
   let itemRef = null;
@@ -288,9 +241,7 @@ export const createOrder = async (items) => {
   const order_number = generateOrderNumber();
   const { ORDERED } = orderStatus;
 
-  const total = items
-    .map(({ price, orderQuantity }) => price * orderQuantity)
-    .reduce((sum, i) => sum + i, 0);
+  const total = items.map(({ price, orderQuantity }) => price * orderQuantity).reduce((sum, i) => sum + i, 0);
   const subtotal = total * (1 - TAX_RATE);
 
   const data = {
@@ -303,9 +254,7 @@ export const createOrder = async (items) => {
     status: ORDERED,
   };
 
-  const createOrderFunctions = firebase
-    .functions()
-    .httpsCallable('createOrder');
+  const createOrderFunctions = functions.httpsCallable('createOrder');
 
   try {
     const response = await createOrderFunctions(data);
@@ -325,13 +274,8 @@ export const createOrder = async (items) => {
 export const fetchOrders = async (limitCount = 0) => {
   let orders = [];
   try {
-    const queryRef = await firestore
-      .collection('order')
-      .orderBy('created_at', 'desc');
-    const querySnapshot =
-      limitCount > 0
-        ? await queryRef.limit(limitCount).get()
-        : await queryRef.get();
+    const queryRef = await firestore.collection('order').orderBy('created_at', 'desc');
+    const querySnapshot = limitCount > 0 ? await queryRef.limit(limitCount).get() : await queryRef.get();
     querySnapshot.forEach((doc) => {
       const order = doc.data();
       order.id = doc.id;
@@ -348,13 +292,8 @@ export const fetchOrdersListener = async (limitCount = 0) => {
   let orderData = [];
 
   try {
-    const queryRef = await firestore
-      .collection('order')
-      .orderBy('created_at', 'desc');
-    const queryOnSnapshot =
-      limitCount > 0
-        ? await queryRef.limit(limitCount).onSnapshot
-        : await queryRef.onSnapshot;
+    const queryRef = await firestore.collection('order').orderBy('created_at', 'desc');
+    const queryOnSnapshot = limitCount > 0 ? await queryRef.limit(limitCount).onSnapshot : await queryRef.onSnapshot;
     const unsubscribe = queryOnSnapshot(
       (snapshot) => {
         orderData = snapshot.docs.map((doc) => ({
@@ -432,9 +371,7 @@ export const updateTrackingNumber = async (trackingNumber, orderNumber) => {
     }
 
     if (status === COMPLETED || status === CANCELED) {
-      throw new Error(
-        '발주 상태가 취소되었거나 완료된 경우 발송됨 처리를 할 수 없습니다',
-      );
+      throw new Error('발주 상태가 취소되었거나 완료된 경우 발송됨 처리를 할 수 없습니다');
     }
     await orderRef.update({
       status: SENT,
@@ -496,10 +433,7 @@ export const updateProfile = async (profile) => {
 
 export const changePassword = async (currentPassword, newPassword) => {
   const user = firebase.auth().currentUser;
-  const credential = firebase.auth.EmailAuthProvider.credential(
-    user.email,
-    currentPassword,
-  );
+  const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
 
   try {
     await user.reauthenticateWithCredential(credential);

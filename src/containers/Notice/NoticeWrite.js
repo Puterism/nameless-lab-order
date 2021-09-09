@@ -5,16 +5,9 @@ import { Grid, Typography, TextField } from '@material-ui/core';
 import DoneIcon from '@material-ui/icons/Done';
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-// import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
-// import Image from '@ckeditor/ckeditor5-image/src/image';
-// import ImageToolbar from '@ckeditor/ckeditor5-image/src/imagetoolbar';
-// import ImageCaption from '@ckeditor/ckeditor5-image/src/imagecaption';
-// import ImageStyle from '@ckeditor/ckeditor5-image/src/imagestyle';
-// import ImageResize from '@ckeditor/ckeditor5-image/src/imageresize';
-// import '@ckeditor/ckeditor5-image/theme';
 import '@ckeditor/ckeditor5-build-classic/build/translations/ko';
 import useStyles from './Notice.css';
-import { firebase } from 'configs/firebase';
+import { functions } from 'configs/firebase';
 import { FirebaseUploadAdapter } from 'utils';
 import { LoadingButton } from 'components';
 
@@ -26,7 +19,7 @@ export default function Notice() {
   const { state } = useLocation();
 
   const createNotice = useCallback(async (newItem) => {
-    const _createNotice = firebase.functions().httpsCallable('notice-createArticle');
+    const _createNotice = functions.httpsCallable('notice-createArticle');
     try {
       await _createNotice(newItem);
     } catch (err) {
@@ -35,7 +28,7 @@ export default function Notice() {
   }, []);
 
   const updateNotice = useCallback(async (newItem, id) => {
-    const _updateNotice = firebase.functions().httpsCallable('notice-updateArticle');
+    const _updateNotice = functions.httpsCallable('notice-updateArticle');
     try {
       await _updateNotice({ newItem, id });
     } catch (err) {
@@ -77,7 +70,7 @@ export default function Notice() {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
-        <Typography varient="h5" component="h2" className={classes.header}>
+        <Typography variant="h5" component="h2" className={classes.header}>
           공지사항 {state ? '수정' : '작성'}
         </Typography>
       </Grid>
@@ -108,14 +101,6 @@ export default function Notice() {
             inputRef={register}
             editor={ClassicEditor}
             config={{
-              // plugins: [
-              //   // Image,
-              //   // ImageCaption,
-              //   // ImageStyle,
-              //   // ImageToolbar,
-              //   // Essentials,
-              //   // ImageResize,
-              // ],
               language: 'ko',
             }}
             data={state ? state.article.data : ''}
@@ -123,8 +108,6 @@ export default function Notice() {
               register('ckeditorData');
 
               const data = editor.getData();
-              console.log(`onInit: ${data}`);
-              // setCkeditorData(data);
               setValue('ckeditorData', data);
               editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
                 return new FirebaseUploadAdapter(loader);
@@ -132,9 +115,7 @@ export default function Notice() {
             }}
             onChange={(event, editor) => {
               const data = editor.getData();
-              // setCkeditorData(data);
               setValue('ckeditorData', data);
-              console.log({ event, editor, data });
             }}
             onBlur={(event, editor) => {
               console.log('Blur.', editor);
