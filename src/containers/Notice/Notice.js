@@ -84,24 +84,6 @@ export default function Notice({ admin }) {
     return () => unsubscribe();
   }, []);
 
-  // TODO: onSnapshot으로 변경 & 삭제 구현
-  // const getNotices = useCallback(async () => {
-  //   setLoading(true);
-  //   const _getNotices = firebase.functions().httpsCallable('getNotices');
-  //   try {
-  //     const response = await _getNotices();
-  //     console.log(response.data);
-  //     setData(response.data);
-  //     setLoading(false);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   getNotices();
-  // }, [getNotices]);
-
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
@@ -109,11 +91,13 @@ export default function Notice({ admin }) {
           공지사항
         </Typography>
       </Grid>
-      <Grid item xs={12}>
-        <Button component={Link} to="/admin/notice/write" variant="contained" color="primary">
-          공지사항 작성
-        </Button>
-      </Grid>
+      {admin && (
+        <Grid item xs={12}>
+          <Button component={Link} to="/admin/notice/write" variant="contained" color="primary">
+            공지사항 작성
+          </Button>
+        </Grid>
+      )}
       {data.length <= 0 && loading && (
         <Grid item xs={12}>
           <CircularProgress />
@@ -150,12 +134,6 @@ export default function Notice({ admin }) {
                 subheader={date}
               />
               <CardContent>
-                {/* <Typography gutterBottom variant="h5" component="h2">
-                </Typography>
-                <Typography gutterBottom color="textSecondary" component="p">
-                  <ScheduleIcon fontSize="small" />
-                  <Typography component="span">2020년 10월 11일</Typography>
-                </Typography> */}
                 <Typography
                   variant="body2"
                   component="p"
