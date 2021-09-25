@@ -45,6 +45,40 @@ exports.createOrder = functions.region('asia-northeast2').https.onCall(async (da
     });
 });
 
+exports.onCreateOrder = functions.firestore.document('order/{id}').onCreate((snap) => {
+  let newOrder = snap.data();
+  let total = 0;
+  const { items } = newOrder;
+  const batch = admin.firestore().batch();
+
+  items.forEach((item) => {
+    const { id, price, quantity, orderQuantity } = item;
+    const itemRef = admin.firestore().collection('item').doc(id);
+    const quantityDecrement = admin.firestore.FieldValue.increment(-orderQuantity);
+    total += price * orderQuantity;
+
+    if (quantity < orderQuantity) {
+      console.error('quantity < orderQuantity', quantity < orderQuantity);
+      throw new Error('Quantity is less than ordered quantity');
+    }
+
+    batch.update(itemRef, {
+      quantity: quantityDecrement,
+    });
+  });
+
+  return batch
+    .commit()
+    .then(() => {
+      console.log('Batch successfully updated!');
+      return true;
+    })
+    .catch((err) => {
+      console.error('Error batch updating document: ', err);
+      throw err;
+    });
+});
+
 exports.createAccount = functions.region('asia-northeast2').https.onCall((data) => {
   return admin
     .auth()
